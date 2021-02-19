@@ -60,7 +60,7 @@ namespace TicTacToe_V._1._1
 						//buttonReload_Click(null,EventArgs.Empty);
 						foreach (Control control in Controls)
 							if (control is Button && control.Name.Length < 3)
-								control.Text = "";
+								control.Invoke(new Action(()=> { control.Text = ""; }));
 
 					foreach (Control control in Controls)
 						if (control is Button && control.Name.Length < 3)
