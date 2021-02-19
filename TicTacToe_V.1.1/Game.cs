@@ -120,7 +120,16 @@ namespace TicTacToe_V._1._1
 					if (control.Name.Length < 3 && control.Text == "")
 						control.Enabled = true;
 		}
-
+		private async void Connect()
+		{
+			await Task.Run(new Action(() => tcpClient = tcpListener.AcceptTcpClient()));
+			//Task.WaitAll();
+			networkStream = tcpClient.GetStream();
+			textBox1.Text = "Ваш ход";
+			ButtonEnabled();
+			Thread thread = new Thread(new ThreadStart(GetMsg));
+			thread.Start();
+		}
 		private void buttonCreate_Click(object sender, System.EventArgs e)
 		{
 			Player = 'X';
@@ -130,17 +139,15 @@ namespace TicTacToe_V._1._1
 			{
 				if (textBoxIP.Text == "")
 				{
-
 					tcpListener = new TcpListener(iPAddress, 8000);
 					tcpListener.Start();
-					tcpClient = tcpListener.AcceptTcpClient();
-					networkStream = tcpClient.GetStream();
-					textBox1.Text = "Ваш ход";
-					ButtonEnabled();
-					Thread thread = new Thread(new ThreadStart(GetMsg));
-					thread.Start();
-
-
+					Connect();
+					//Task.WaitAll(Task.Run(new Action(() => tcpClient = tcpListener.AcceptTcpClient())));
+					//networkStream = tcpClient.GetStream();
+					//textBox1.Text = "Ваш ход";
+					//ButtonEnabled();
+					//Thread thread = new Thread(new ThreadStart(GetMsg));
+					//thread.Start();
 				}
 			}
 			catch (Exception ex)
