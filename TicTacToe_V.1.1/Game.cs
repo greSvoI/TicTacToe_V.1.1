@@ -173,6 +173,7 @@ namespace TicTacToe_V._1._1
 		}
 		private void buttonConnect_Click(object sender, EventArgs e)
 		{
+			buttonReload.Enabled = false;
 			Player = 'O';
 			Opponent = 'X';
 			try
