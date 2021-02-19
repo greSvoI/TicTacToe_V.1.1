@@ -29,18 +29,16 @@ namespace TicTacToe_V._1._1
 					if(control.Name.Length<3)
 				control.Click += Control_Click;
 		}
-		private void GameStream()
-		{
-			if (Chek()) return;
-			ButtonDisabled();
-			this.textBox1.Text = "Ход противника";
-			//Thread thread = new Thread(new ThreadStart(GetMsg));
-			//thread.Start();
-			GetMsg();
-			this.textBox1.Text = "Ваш ход";
-			if (!Chek())
-				ButtonEnabled();
-		}
+		//private void GameStream()
+		//{
+		//	if (Chek()) return;
+		//	ButtonDisabled();
+		//	this.textBox1.Text = "Ход противника";
+		//	GetMsg();
+		//	this.textBox1.Text = "Ваш ход";
+		//	if (!Chek())
+		//		ButtonEnabled();
+		//}
 		private void GetMsg()
 		{
 			try
@@ -58,12 +56,15 @@ namespace TicTacToe_V._1._1
 					} while (networkStream.DataAvailable);
 
 					string temp = stringBuilder.ToString();
-
+					if (temp == "reload")
+						//buttonReload_Click(null,EventArgs.Empty);
+						foreach (Control control in Controls)
+							if (control is Button && control.Name.Length < 3)
+								control.Text = "";
 
 					foreach (Control control in Controls)
 						if (control is Button && control.Name.Length < 3)
 							if (control.Name == temp)
-								//control.Text = Opponent.ToString();
 								control.Invoke(new Action(() =>
 								{
 									control.Text = Opponent.ToString();
@@ -72,9 +73,6 @@ namespace TicTacToe_V._1._1
 										ButtonEnabled();
 								}));
 				}
-				//textBox1.Invoke(new Action(() => textBox1.Text = "Ваш ход"));
-				//textBox1.Text = "Ваш ход";
-				//ButtonEnabled();
 			}
 			catch (Exception ex)
 			{
@@ -100,8 +98,6 @@ namespace TicTacToe_V._1._1
 
 			if (Chek()) return;
 			ButtonDisabled();
-			
-			//GameStream();
 		}
 
 		private void Game_FormClosing(object sender, FormClosingEventArgs e)
@@ -129,7 +125,7 @@ namespace TicTacToe_V._1._1
 		{
 			Player = 'X';
 			Opponent = 'O';
-
+			buttonReload.Enabled = true;
 			try
 			{
 				if (textBoxIP.Text == "")
@@ -137,11 +133,7 @@ namespace TicTacToe_V._1._1
 
 					tcpListener = new TcpListener(iPAddress, 8000);
 					tcpListener.Start();
-				    // Connect();
 					tcpClient = tcpListener.AcceptTcpClient();
-					//Thread start = new Thread(new ThreadStart(Connect));
-					//start.Start();
-					//tcpClient = tcpListener.AcceptTcpClient();
 					networkStream = tcpClient.GetStream();
 					textBox1.Text = "Ваш ход";
 					ButtonEnabled();
@@ -161,16 +153,6 @@ namespace TicTacToe_V._1._1
 
 			
 		}
-		private async void Connect()
-		{
-			await Task.Run(() => tcpClient = tcpListener.AcceptTcpClient());
-			
-			networkStream = tcpClient.GetStream();
-			textBox1.Text = "Ваш ход";
-			Thread thread = new Thread(new ThreadStart(GetMsg));
-			thread.Start();
-			ButtonEnabled();
-		}
 		private void buttonConnect_Click(object sender, EventArgs e)
 		{
 			buttonReload.Enabled = false;
@@ -183,9 +165,6 @@ namespace TicTacToe_V._1._1
 				networkStream = tcpClient.GetStream();
 				Thread thread = new Thread(new ThreadStart(GetMsg));
 				thread.Start();
-				//ButtonDisabled();
-				//this.textBox1.Text = "Ход противника";
-				//GameStream();
 			}
 			catch (Exception ex)
 			{
@@ -261,6 +240,8 @@ namespace TicTacToe_V._1._1
 			foreach (Control control in Controls)
 				if (control is Button && control.Name.Length < 3)
 					control.Text = "";
+			byte[] data = Encoding.UTF8.GetBytes("reload");
+			networkStream.Write(data, 0, data.Length);
 		}
 	}
 }
